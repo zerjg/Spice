@@ -105,7 +105,7 @@ namespace Spice.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, SubCategoryAndCategoryViewModel model)
+        public async Task<IActionResult> Edit(SubCategoryAndCategoryViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -117,7 +117,9 @@ namespace Spice.Areas.Admin.Controllers
                 }
                 else
                 {
-                    _db.SubCategory.Add(model.SubCategory);
+                    var subCatFromDb = await _db.SubCategory.FindAsync(model.SubCategory.Id);
+                    subCatFromDb.Name = model.SubCategory.Name;
+                    
                     await _db.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
@@ -129,6 +131,7 @@ namespace Spice.Areas.Admin.Controllers
                 SubCategoryList = await _db.SubCategory.OrderBy(p => p.Name).Select(p => p.Name).ToListAsync(),
                 StatusMessage = StatusMessage
             };
+            //modelVM.SubCategory.Id = id;
             return View(modelVM);
         }
     }
